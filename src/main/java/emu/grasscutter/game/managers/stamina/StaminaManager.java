@@ -2,11 +2,10 @@ package emu.grasscutter.game.managers.stamina;
 
 import ch.qos.logback.classic.Logger;
 import emu.grasscutter.Grasscutter;
-import emu.grasscutter.command.commands.NoStaminaCommand;
-import emu.grasscutter.data.GameData;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.entity.EntityAvatar;
 import emu.grasscutter.game.entity.GameEntity;
+import emu.grasscutter.game.player.BasePlayerManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.FightProperty;
 import emu.grasscutter.game.props.LifeState;
@@ -23,14 +22,13 @@ import emu.grasscutter.server.packet.send.*;
 import emu.grasscutter.utils.Position;
 import org.jetbrains.annotations.NotNull;
 
+import static emu.grasscutter.config.Configuration.GAME_OPTIONS;
+
 import java.util.*;
 
-import static emu.grasscutter.Configuration.GAME_OPTIONS;
-
-public class StaminaManager {
+public class StaminaManager extends BasePlayerManager {
 
     // TODO: Skiff state detection?
-    private final Player player;
     private static final HashMap<String, HashSet<MotionState>> MotionStatesCategorized = new HashMap<>() {{
         put("CLIMB", new HashSet<>(List.of(
                 MotionState.MOTION_STATE_CLIMB, // sustained, when not moving no cost no recover
@@ -112,8 +110,8 @@ public class StaminaManager {
     }};
 
     private final Logger logger = Grasscutter.getLogger();
-    public final static int GlobalCharacterMaximumStamina = 24000;
-    public final static int GlobalVehicleMaxStamina = 24000;
+    public final static int GlobalCharacterMaximumStamina = PlayerProperty.PROP_MAX_STAMINA.getMax();
+    public final static int GlobalVehicleMaxStamina = PlayerProperty.PROP_MAX_STAMINA.getMax();
     private Position currentCoordinates = new Position(0, 0, 0);
     private Position previousCoordinates = new Position(0, 0, 0);
     private MotionState currentState = MotionState.MOTION_STATE_STANDBY;
@@ -161,11 +159,11 @@ public class StaminaManager {
     }};
 
     public static void initialize() {
-    	// TODO: Initialize foods etc.
+        // TODO: Initialize foods etc.
     }
 
     public StaminaManager(Player player) {
-        this.player = player;
+        super(player);
     }
 
     // Accessors
@@ -285,14 +283,13 @@ public class StaminaManager {
     // Returns new stamina and sends PlayerPropNotify or VehicleStaminaNotify
     public int setStamina(GameSession session, String reason, int newStamina, boolean isCharacterStamina) {
         // Target Player
-        if (!GAME_OPTIONS.staminaUsage || session.getPlayer().getStamina()) {
+        if (!GAME_OPTIONS.staminaUsage || session.getPlayer().getUnlimitedStamina()) {
             newStamina = getMaxCharacterStamina();
         }
 
         // set stamina if is character stamina
         if (isCharacterStamina) {
             player.setProperty(PlayerProperty.PROP_CUR_PERSIST_STAMINA, newStamina);
-            session.send(new PacketPlayerPropNotify(player, PlayerProperty.PROP_CUR_PERSIST_STAMINA));
         } else {
             vehicleStamina = newStamina;
             session.send(new PacketVehicleStaminaNotify(vehicleId, ((float) newStamina) / 100));
@@ -532,20 +529,20 @@ public class StaminaManager {
         }
         // Bow avatar charged attack
         Avatar currentAvatar = player.getTeamManager().getCurrentAvatarEntity().getAvatar();
-        
+
         switch (currentAvatar.getAvatarData().getWeaponType()) {
-        	case WEAPON_BOW:
-        		return getBowSustainedCost(skillCasting);
-        	case WEAPON_CLAYMORE:
-        		return getClaymoreSustainedCost(skillCasting);
-        	case WEAPON_CATALYST:
-        		return getCatalystCost(skillCasting);
-        	case WEAPON_POLE:
-        		return getPolearmCost(skillCasting);
-        	case WEAPON_SWORD_ONE_HAND:
-        		return getSwordCost(skillCasting);
+            case WEAPON_BOW:
+                return getBowSustainedCost(skillCasting);
+            case WEAPON_CLAYMORE:
+                return getClaymoreSustainedCost(skillCasting);
+            case WEAPON_CATALYST:
+                return getCatalystCost(skillCasting);
+            case WEAPON_POLE:
+                return getPolearmCost(skillCasting);
+            case WEAPON_SWORD_ONE_HAND:
+                return getSwordCost(skillCasting);
         }
-        
+
         return new Consumption();
     }
 

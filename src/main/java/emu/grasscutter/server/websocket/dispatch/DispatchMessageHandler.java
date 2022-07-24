@@ -10,7 +10,7 @@ import emu.grasscutter.game.Account;
 import emu.grasscutter.server.http.dispatch.RegionHandler;
 import emu.grasscutter.server.http.objects.RPCRequest;
 import emu.grasscutter.server.http.objects.RPCResponse;
-import emu.grasscutter.utils.ConfigContainer;
+import emu.grasscutter.config.ConfigContainer;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import org.jetbrains.annotations.NotNull;

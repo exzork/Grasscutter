@@ -8,7 +8,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import com.google.gson.reflect.TypeToken;
 import java.net.URI;
-import static emu.grasscutter.Configuration.*;
+import static emu.grasscutter.config.Configuration.*;
 
 public class GameWebSocketClient extends WebSocketClient{
     private RPCResponse.RPCResponseError<?> responseError = null;

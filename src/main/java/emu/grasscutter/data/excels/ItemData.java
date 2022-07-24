@@ -1,5 +1,6 @@
 package emu.grasscutter.data.excels;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
@@ -8,42 +9,45 @@ import emu.grasscutter.data.ResourceType;
 import emu.grasscutter.data.common.ItemUseData;
 import emu.grasscutter.game.inventory.*;
 import emu.grasscutter.game.props.FightProperty;
+import emu.grasscutter.game.props.ItemUseTarget;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import lombok.Getter;
 
 @ResourceType(name = {"MaterialExcelConfigData.json",
         "WeaponExcelConfigData.json",
         "ReliquaryExcelConfigData.json",
         "HomeWorldFurnitureExcelConfigData.json"
 })
+@Getter
 public class ItemData extends GameResource {
-	
+	// Main
 	private int id;
     private int stackLimit = 1;
     private int maxUseCount;
     private int rankLevel;
     private String effectName;
-    private int[] satiationParams;
     private int rank;
     private int weight;
     private int gadgetId;
     
     private int[] destroyReturnMaterial;
     private int[] destroyReturnMaterialCount;
-
-    private List<ItemUseData> itemUse;
+    
+    // Enums
+    private ItemType itemType = ItemType.ITEM_NONE;
+    private MaterialType materialType = MaterialType.MATERIAL_NONE;
+    private EquipType equipType = EquipType.EQUIP_NONE;
+    private String effectType;
+    private String destroyRule;
     
     // Food
     private String foodQuality;
-    private String useTarget;
-    private String[] iseParam;
+    private int[] satiationParams;
     
-    // String enums
-    private String itemType;
-    private String materialType;
-    private String equipType;
-    private String effectType;
-    private String destroyRule;
+    // Usable item
+    private ItemUseTarget useTarget;
+    private List<ItemUseData> itemUse;
     
     // Relic
     private int mainPropDepotId;
@@ -65,15 +69,7 @@ public class ItemData extends GameResource {
     private WeaponProperty[] weaponProp;
     
     // Hash
-    private String icon;
     private long nameTextMapHash;
-    
-    // Post load
-    private transient MaterialType materialEnumType;
-    private transient ItemType itemEnumType;
-    private transient EquipType equipEnumType;
-    
-    private IntSet addPropLevelSet;
 
     // Furniture
     private int comfort;
@@ -81,158 +77,17 @@ public class ItemData extends GameResource {
     private List<Integer> furnitureGadgetID;
     @SerializedName("JFDLJGDFIGL")
     private int roomSceneId;
+    
+    // Custom
+    private transient IntSet addPropLevelSet;
 
     @Override
 	public int getId(){
         return this.id;
     }
     
-    public String getMaterialTypeString(){
-        return this.materialType;
-    }
-    
-    public int getStackLimit(){
-        return this.stackLimit;
-    }
-    
-    public int getMaxUseCount(){
-        return this.maxUseCount;
-    }
-    
-    public String getUseTarget(){
-        return this.useTarget;
-    }
-    
-    public String[] getUseParam(){
-        return this.iseParam;
-    }
-    
-    public int getRankLevel(){
-        return this.rankLevel;
-    }
-    
-    public String getFoodQuality(){
-        return this.foodQuality;
-    }
-    
-    public String getEffectName(){
-        return this.effectName;
-    }
-    
-    public int[] getSatiationParams(){
-        return this.satiationParams;
-    }
-    
-    public int[] getDestroyReturnMaterial(){
-        return this.destroyReturnMaterial;
-    }
-    
-    public int[] getDestroyReturnMaterialCount(){
-        return this.destroyReturnMaterialCount;
-    }
-
-    public List<ItemUseData> getItemUse() {
-        return itemUse;
-    }
-
-    public long getNameTextMapHash(){
-        return this.nameTextMapHash;
-    }
-    
-    public String getIcon(){
-        return this.icon;
-    }
-    
-    public String getItemTypeString(){
-        return this.itemType;
-    }
-    
-    public int getRank(){
-        return this.rank;
-    }
-    
-    public int getGadgetId() {
-		return gadgetId;
-    }
-    
-	public int getBaseConvExp() {
-		return baseConvExp;
-	}
-	
-	public int getMainPropDepotId() {
-		return mainPropDepotId;
-	}
-	
-	public int getAppendPropDepotId() {
-		return appendPropDepotId;
-	}
-	
-	public int getAppendPropNum() {
-		return appendPropNum;
-	}
-	
-	public int getSetId() {
-		return setId;
-	}
-	
-	public int getWeaponPromoteId() {
-		return weaponPromoteId;
-	}
-	
-	public int getWeaponBaseExp() {
-		return weaponBaseExp;
-	}
-	
-	public int getAwakenMaterial() {
-        	return awakenMaterial;
-    	}
-	
-	public int[] getAwakenCosts() {
-		return awakenCosts;
-	}
-	
-	public IntSet getAddPropLevelSet() {
-		return addPropLevelSet;
-	}
-	
-	public int[] getSkillAffix() {
-		return skillAffix;
-	}
-	
-	public WeaponProperty[] getWeaponProperties() {
-		return weaponProp;
-	}
-	
-	public int getMaxLevel() {
-		return maxLevel;
-	}
-
-    public int getComfort() {
-        return comfort;
-    }
-
-    public List<Integer> getFurnType() {
-        return furnType;
-    }
-
-    public List<Integer> getFurnitureGadgetID() {
-        return furnitureGadgetID;
-    }
-
-    public int getRoomSceneId() {
-        return roomSceneId;
-    }
-
-    public ItemType getItemType() {
-    	return this.itemEnumType;
-    }
-    
-    public MaterialType getMaterialType() {
-    	return this.materialEnumType;
-    }
-    
-    public EquipType getEquipType() {
-    	return this.equipEnumType;
+    public WeaponProperty[] getWeaponProperties() {
+        return this.weaponProp;
     }
     
     public boolean canAddRelicProp(int level) {
@@ -240,64 +95,37 @@ public class ItemData extends GameResource {
     }
     
 	public boolean isEquip() {
-		return this.itemEnumType == ItemType.ITEM_RELIQUARY || this.itemEnumType == ItemType.ITEM_WEAPON;
+		return this.itemType == ItemType.ITEM_RELIQUARY || this.itemType == ItemType.ITEM_WEAPON;
 	}
     
     @Override
 	public void onLoad() {
-    	this.itemEnumType = ItemType.getTypeByName(getItemTypeString());
-    	this.materialEnumType = MaterialType.getTypeByName(getMaterialTypeString());
-
-		if (this.itemEnumType == ItemType.ITEM_RELIQUARY) {
-			this.equipEnumType = EquipType.getTypeByName(this.equipType);
+		if (this.itemType == ItemType.ITEM_RELIQUARY) {
 			if (this.addPropLevels != null && this.addPropLevels.length > 0) {
 				this.addPropLevelSet = new IntOpenHashSet(this.addPropLevels);
 			}
-		} else if (this.itemEnumType == ItemType.ITEM_WEAPON) {
-			this.equipEnumType = EquipType.EQUIP_WEAPON;
+		} else if (this.itemType == ItemType.ITEM_WEAPON) {
+			this.equipType = EquipType.EQUIP_WEAPON;
 		} else {
-			this.equipEnumType = EquipType.EQUIP_NONE;
+			this.equipType = EquipType.EQUIP_NONE;
 		}
 		
-		if (this.getWeaponProperties() != null) {
-			for (WeaponProperty weaponProperty : this.getWeaponProperties()) {
-				weaponProperty.onLoad();
-			}
+		if (this.weaponProp != null) {
+		    this.weaponProp = Arrays.stream(this.weaponProp).filter(prop -> prop.getPropType() != null).toArray(WeaponProperty[]::new);
 		}
 
-        if(this.getFurnType() != null){
+        if (this.getFurnType() != null) {
             this.furnType = this.furnType.stream().filter(x -> x > 0).toList();
         }
-        if(this.getFurnitureGadgetID() != null){
+        if (this.getFurnitureGadgetID() != null) {
             this.furnitureGadgetID = this.furnitureGadgetID.stream().filter(x -> x > 0).toList();
         }
     }
     
+    @Getter
     public static class WeaponProperty {
-    	private FightProperty fightProp;
-        private String propType;
+        private FightProperty propType;
         private float initValue;
         private String type;
-
-        public String getPropType(){
-            return this.propType;
-        }
-        
-        public float getInitValue(){
-            return this.initValue;
-        }
-        
-        public String getType(){
-            return this.type;
-        }
-
-		public FightProperty getFightProp() {
-			return fightProp;
-		}
-
-		public void onLoad() {
-			this.fightProp = FightProperty.getPropByName(propType);
-		}
-        
     }
 }

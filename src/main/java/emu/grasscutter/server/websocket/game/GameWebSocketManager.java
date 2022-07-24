@@ -4,8 +4,8 @@ import emu.grasscutter.Grasscutter;
 
 import java.net.URI;
 
-import static emu.grasscutter.Configuration.HTTP_INFO;
-import static emu.grasscutter.Configuration.SERVER;
+import static emu.grasscutter.config.Configuration.HTTP_INFO;
+import static emu.grasscutter.config.Configuration.SERVER;
 
 public class GameWebSocketManager {
     private GameWebSocketClient gameWebSocketClient;

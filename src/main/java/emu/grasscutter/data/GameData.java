@@ -15,6 +15,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import lombok.Getter;
 
 public class GameData {
 	// BinOutputs
@@ -75,6 +76,7 @@ public class GameData {
 	private static final ArrayList<CodexReliquaryData> codexReliquaryArrayList = new ArrayList<>();
 	private static final Int2ObjectMap<FetterCharacterCardData> fetterCharacterCardDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<RewardData> rewardDataMap = new Int2ObjectOpenHashMap<>();
+	
 	private static final Int2ObjectMap<WorldAreaData> worldAreaDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<WorldLevelData> worldLevelDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<DailyDungeonData> dailyDungeonDataMap = new Int2ObjectOpenHashMap<>();
@@ -89,18 +91,31 @@ public class GameData {
 	private static final Int2ObjectMap<TowerFloorData> towerFloorDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<TowerLevelData> towerLevelDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<TowerScheduleData> towerScheduleDataMap = new Int2ObjectOpenHashMap<>();
+	private static final Int2ObjectMap<BuffData> buffDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<ForgeData> forgeDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<HomeWorldLevelData> homeWorldLevelDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<FurnitureMakeConfigData> furnitureMakeConfigDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<InvestigationMonsterData> investigationMonsterDataMap = new Int2ObjectOpenHashMap<>();
 	private static final Int2ObjectMap<CityData> cityDataMap = new Int2ObjectOpenHashMap<>();
-	private static final Int2ObjectMap<BattlePassMissionExcelConfigData> battlePassMissionExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
-	private static final Int2ObjectMap<BattlePassRewardExcelConfigData> battlePassRewardExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
+	private static final Int2ObjectMap<WeatherData> weatherDataMap = new Int2ObjectOpenHashMap<>();
+	private static final Int2ObjectMap<BattlePassMissionData> battlePassMissionDataMap = new Int2ObjectOpenHashMap<>();
+	private static final Int2ObjectMap<BattlePassRewardData> battlePassRewardDataMap = new Int2ObjectOpenHashMap<>();
+	private static final Int2ObjectMap<CookRecipeData> cookRecipeDataMap = new Int2ObjectOpenHashMap<>();
+	private static final Int2ObjectMap<CookBonusData> cookBonusDataMap = new Int2ObjectOpenHashMap<>();
+
+	@Getter private static final Int2ObjectMap<ActivityData> activityDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<ActivityWatcherData> activityWatcherDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<MusicGameBasicData> musicGameBasicDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<PersonalLineData> personalLineDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<ChapterData> chapterDataMap = new Int2ObjectOpenHashMap<>();
+
+    @Getter private static final Int2ObjectMap<OpenStateData> openStateDataMap = new Int2ObjectOpenHashMap<>();
 
 	// Cache
 	private static Map<Integer, List<Integer>> fetters = new HashMap<>();
 	private static Map<Integer, List<ShopGoodsData>> shopGoods = new HashMap<>();
 	private static final IntList scenePointIdList = new IntArrayList();
+	@Getter private static final List<OpenStateData> openStateList = new ArrayList<>();
 	
 	public static Int2ObjectMap<?> getMapByResourceDef(Class<?> resourceDefinition) {
 		Int2ObjectMap<?> map = null;
@@ -414,15 +429,32 @@ public class GameData {
 	public static Int2ObjectMap<InvestigationMonsterData> getInvestigationMonsterDataMap() {
 		return investigationMonsterDataMap;
 	}
+
 	public static Int2ObjectMap<CityData> getCityDataMap() {
 		return cityDataMap;
 	}
 
-	public static Int2ObjectMap<BattlePassMissionExcelConfigData> getBattlePassMissionExcelConfigDataMap() {
-		return battlePassMissionExcelConfigDataMap;
+	public static Int2ObjectMap<WeatherData> getWeatherDataMap() {
+		return weatherDataMap;
 	}
 
-	public static Int2ObjectMap<BattlePassRewardExcelConfigData> getBattlePassRewardExcelConfigDataMap() {
-		return battlePassRewardExcelConfigDataMap;
+	public static Int2ObjectMap<BattlePassMissionData> getBattlePassMissionDataMap() {
+		return battlePassMissionDataMap;
 	}
+
+	public static Int2ObjectMap<BattlePassRewardData> getBattlePassRewardDataMap() {
+		return battlePassRewardDataMap;
+	}
+
+	public static Int2ObjectMap<CookRecipeData> getCookRecipeDataMap() {
+		return cookRecipeDataMap;
+	}
+
+	public static Int2ObjectMap<CookBonusData> getCookBonusDataMap() {
+		return cookBonusDataMap;
+	}
+
+    public static Int2ObjectMap<BuffData> getBuffDataMap() {
+        return buffDataMap;
+    }
 }

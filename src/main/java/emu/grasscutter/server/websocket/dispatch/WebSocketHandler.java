@@ -10,7 +10,7 @@ import io.javalin.Javalin;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static emu.grasscutter.Configuration.*;
+import static emu.grasscutter.config.Configuration.*;
 
 public final class WebSocketHandler implements Router {
     public static HashMap<String,Region> regionsIp = new HashMap<>();

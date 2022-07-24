@@ -1,5 +1,7 @@
 package emu.grasscutter.database;
 
+import static emu.grasscutter.config.Configuration.*;
+
 import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -13,6 +15,8 @@ import dev.morphia.query.experimental.filters.Filters;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Grasscutter.ServerRunMode;
 import emu.grasscutter.game.Account;
+import emu.grasscutter.game.activity.PlayerActivityData;
+import emu.grasscutter.game.activity.musicgame.MusicGameBeatmap;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.battlepass.BattlePassManager;
 import emu.grasscutter.game.friends.Friendship;
@@ -23,16 +27,15 @@ import emu.grasscutter.game.mail.Mail;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.quest.GameMainQuest;
 
-import static emu.grasscutter.Configuration.*;
-
 public final class DatabaseManager {
 	private static Datastore gameDatastore;
 	private static Datastore dispatchDatastore;
     private static Datastore hybridDatastore;
 
 	private static final Class<?>[] mappedGameClasses = new Class<?>[] {
-		Player.class, Avatar.class, GameItem.class, Friendship.class,
-		GachaRecord.class, Mail.class, GameMainQuest.class
+        DatabaseCounter.class, Player.class, Avatar.class, GameItem.class, Friendship.class,
+        GachaRecord.class, Mail.class, GameMainQuest.class, GameHome.class, BattlePassManager.class,
+        PlayerActivityData.class, MusicGameBeatmap.class
 	};
 
 	private static final Class<?>[] mappedDispatchClasses = new Class<?>[]{
@@ -41,15 +44,16 @@ public final class DatabaseManager {
 
     private static final Class<?>[] mappedHybridClasses = new Class<?>[] {
         DatabaseCounter.class, Account.class, Player.class, Avatar.class, GameItem.class, Friendship.class,
-        GachaRecord.class, Mail.class, GameMainQuest.class
+        GachaRecord.class, Mail.class, GameMainQuest.class, GameHome.class, BattlePassManager.class,
+        PlayerActivityData.class, MusicGameBeatmap.class
     };
 
     public static Datastore getGameDatastore() {
-    	return gameDatastore;
+        return gameDatastore;
     }
 
     public static MongoDatabase getGameDatabase() {
-    	return getGameDatastore().getDatabase();
+        return getGameDatastore().getDatabase();
     }
 
 	// Yes. I very dislike this method. However, this will be good for now.
@@ -134,7 +138,7 @@ public final class DatabaseManager {
 		}
 	}
 
-	public static synchronized int getNextId(Object o) {
-		return getNextId(o.getClass());
-	}
+    public static synchronized int getNextId(Object o) {
+        return getNextId(o.getClass());
+    }
 }

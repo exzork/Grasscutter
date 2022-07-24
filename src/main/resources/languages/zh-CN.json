@@ -28,6 +28,8 @@
         "login_token_attempt": "[Dispatch] 客户端 %s 正在尝试通过 token 登录",
         "login_token_error": "[Dispatch] 客户端 %s 通过 token 登录失败",
         "login_token_success": "[Dispatch] 客户端 %s 已通过 token 登录，UID 为 %s",
+        "login_password_error": "🇺🇸[Dispatch] Client %s failed to log in via password.",
+        "login_password_storage_error": "🇺🇸[Dispatch] Client %s failed to log in via password because there is no password in the database.",
         "combo_token_success": "[Dispatch] 客户端 %s 成功交换 token",
         "combo_token_error": "[Dispatch] 客户端 %s 交换 token 失败",
         "account_login_create_success": "[Dispatch] 客户端 %s 登录失败：已注册 UID 为 %s 的账号",
@@ -37,6 +39,9 @@
         "session_key_error": "会话密钥错误",
         "username_error": "未找到用户名",
         "username_create_error": "未找到用户名，建立连接失败",
+        "password_error": "🇺🇸Invalid Password",
+        "password_length_error": "🇺🇸Password length must be greater then or equal to 8",
+        "password_storage_error": "🇺🇸You don't have a password for your account. Please contact an administrator.",
         "server_max_player_limit": "服务器在线人数已满"
       },
       "router_error": "[Dispatch] 无法连接路由"
@@ -53,7 +58,11 @@
       "create_resources": "正在创建 resources 目录...",
       "resources_error": "请将 BinOutput 和 ExcelBinOutput 复制到 resources 目录。",
       "version": "Grasscutter 版本：%s-%s",
-      "game_version": "游戏版本：%s"
+      "game_version": "游戏版本：%s",
+      "resources": {
+        "loading": "正在加载 resources...",
+        "finish": "完成加载 resources。"
+      }
     }
   },
   "commands": {
@@ -66,6 +75,8 @@
       "command_exist_error": "未找到命令。",
       "no_usage_specified": "未指定用法",
       "no_description_specified": "未指定说明",
+      "set_to": "%s 已设为 %s。",
+      "set_for_to": "%s [来自 %s] 已设为 %s。",
       "invalid": {
         "amount": "无效的数量。",
         "artifactId": "无效的圣遗物ID。",
@@ -75,17 +86,18 @@
         "itemId": "无效的物品ID。",
         "itemLevel": "无效的物品等级。",
         "itemRefinement": "无效的物品精炼等级。",
+        "statValue": "无效的属性值。",
+        "value_between": "无效的数值：%s 必须在 %s 和 %s 之间。",
         "playerId": "无效的玩家ID。",
-        "uid": "无效的UID。"
+        "uid": "无效的UID。",
+        "id": "无效的ID。"
       }
     },
     "execution": {
-      "uid_error": "无效的UID。",
+      "usage_prefix": "用法：",
       "player_exist_error": "玩家不存在。",
       "player_offline_error": "玩家已离线。",
-      "item_id_error": "无效的物品ID。",
       "item_player_exist_error": "无效的物品/玩家UID。",
-      "entity_id_error": "无效的实体ID。",
       "player_exist_offline_error": "玩家不存在或已离线。",
       "argument_error": "无效的参数。",
       "clear_target": "目标已清除。",
@@ -99,33 +111,25 @@
     "status": {
       "enabled": "已启用",
       "disabled": "未启用",
-      "help": "帮助", 
+      "help": "帮助",
       "success": "成功"
     },
     "account": {
-      "modify": "修改用户账号",
       "invalid": "无效的UID。",
       "exists": "具有此用户名和/或 UID 的账号已存在。",
       "create": "已创建 UID 为 %s 的账号。",
       "delete": "账号已删除。",
       "no_account": "账号不存在。",
-      "command_usage": "用法：account <create|delete> <用户名> [UID]",
       "description": "创建或删除账号"
     },
-    "broadcast": {
-      "command_usage": "用法：broadcast <消息>",
-      "message_sent": "公告已发送。",
-      "description": "向所有玩家发送公告"
-    },
-    "changescene": {
-      "usage": "用法：changescene <场景ID>",
-      "already_in_scene": "你已经在这个场景中了。",
-      "success": "已切换至场景 %s。",
-      "exists_error": "此场景不存在。",
-      "description": "切换指定场景"
+    "announce": {
+      "send_success": "成功发送了一则公告，你可以通过 /a revoke %s 撤销。",
+      "refresh_success": "成功刷新了公告配置。[共 %s 个]",
+      "revoke_done": "尝试撤回公告 %s。",
+      "not_found": "找不到公告 %s。",
+      "description": "向所有在线玩家发送公告，或者管理服务器的公告"
     },
     "clear": {
-      "command_usage": "用法：clear <all|wp|art|mat>\nall: 所有, wp: 武器, art: 圣遗物, mat: 材料",
       "weapons": "已清除 %s 的武器。",
       "artifacts": "已清除 %s 的圣遗物。",
       "materials": "已清除 %s 的材料。",
@@ -136,64 +140,36 @@
       "description": "从你的背包中删除所有未装备且已解锁的物品，包括稀有物品"
     },
     "coop": {
-      "usage": "用法：coop [指定玩家UID]",
       "success": "已强制传送 %s 到 %s 的世界。",
       "description": "强制传送指定玩家到他人的世界。如果没有指定玩家，则会使你进入多人游戏状态"
     },
-    "drop": {
-      "command_usage": "用法：drop <物品ID|物品名称> [数量]",
-      "success": "已丢下 %s 个 %s。",
-      "description": "在你附近丢下物品"
-    },
     "enter_dungeon": {
-      "usage": "用法：enterdungeon <秘境ID>",
       "changed": "已进入秘境 %s。",
-      "not_found_error": "此秘境不存在。",
-      "in_dungeon_error": "你已经在秘境中了。",
+      "not_found_error": "秘境不存在。",
+      "in_dungeon_error": "你已经在这个秘境中了。",
       "description": "进入指定秘境"
     },
-    "giveAll": {
-      "usage": "用法：giveall [玩家] [数量]",
-      "started": "正在给予全部物品...",
-      "success": "已给予 %s 全部物品。",
-      "invalid_amount_or_playerId": "无效的数量/玩家ID。",
-      "description": "给予所有物品"
-    },
-    "giveArtifact": {
-      "usage": "用法：giveart|gart [玩家] <圣遗物ID> <主词条ID> [<副词条ID>[,<强化次数>]]... [等级]",
-      "id_error": "无效的圣遗物ID。",
-      "success": "已将 %s 给予 %s。",
-      "description": "给予指定圣遗物"
-    },
-    "giveChar": {
-      "usage": "用法：givechar <玩家> <角色ID> [等级]",
-      "given": "已将角色 %s [等级 %s] 给与 %s。",
-      "invalid_avatar_id": "无效的角色ID。",
-      "invalid_avatar_level": "无效的角色等级。",
-      "invalid_avatar_or_player_id": "无效的角色ID/玩家ID。",
-      "description": "给予指定角色"
-    },
     "give": {
-      "usage": "用法：give <玩家> <物品ID|物品名> [数量] [等级] [精炼等级]",
-      "refinement_only_applicable_weapons": "只有武器可以设置精炼等级。",
-      "refinement_must_between_1_and_5": "精炼等级必须在 1-5 之间。",
+      "usage_relic": "用法：give <圣遗物ID> [主词条ID] [<副词条ID>[,<强化次数>]]... [lv<等级 0-20>]",
+      "illegal_relic": "此圣遗物ID属于黑名单范围，也许不是你想要的。",
       "given": "已将 %s 个 %s 给予 %s。",
       "given_with_level_and_refinement": "已将 %s [等级 %s, 精炼 %s] %s 个给予 %s。",
       "given_level": "已将 %s [等级 %s] %s 个给予 %s。",
-      "description": "给予指定物品"
-    },
-    "godmode": {
-      "success": "Godmode 已设为 %s。[用户：%s]",
-      "description": "防止你受到伤害"
+      "given_avatar": "已将角色 %s [等级 %s] 给与 %s。",
+      "giveall_success": "成功给予全部物品。",
+      "description": "向你或指定的玩家给予物品。比如可以给予全部武器，角色和/或材料，也可以给予自定义圣遗物"
     },
     "heal": {
       "success": "已治疗所有角色。",
       "description": "治疗当前队伍的角色"
     },
     "help": {
-      "usage": "用法：",
       "aliases": "别名：",
       "available_commands": "可用命令：",
+      "tip_need_permission": "所需权限：",
+      "tip_need_no_permission": "无",
+      "tip_permission_targeted": " (对其他玩家使用这个命令还需要权限 %s)",
+      "warn_player_has_no_permission": "注意：你没有执行这个命令的权限。",
       "description": "发送帮助信息或显示指定命令的信息"
     },
     "kick": {
@@ -202,18 +178,16 @@
       "description": "从服务器内踢出指定玩家"
     },
     "killall": {
-      "usage": "用法：killall [玩家UID] [场景ID]",
       "scene_not_found_in_player_world": "未在玩家世界中找到此场景。",
       "kill_monsters_in_scene": "已杀死场景 %s 中的 %s 个怪物。",
       "description": "杀死所有怪物"
     },
     "killCharacter": {
-      "usage": "用法：killcharacter [玩家ID]",
       "success": "已杀死 %s 当前角色。",
       "description": "杀死玩家当前角色"
     },
     "language": {
-      "current_language": "当前语言是：%s",
+      "current_language": "当前语言：%s",
       "language_changed": "语言切换至：%s",
       "language_not_found": "目前服务端没有这种语言：%s",
       "description": "显示或切换当前语言"
@@ -222,12 +196,7 @@
       "success": "目前在线人数：%s",
       "description": "查看所有玩家"
     },
-    "nostamina": {
-      "success": "NoStamina 已设为 %s。[用户：%s]",
-      "description": "保持你的体力处于最高状态"
-    },
     "permission": {
-      "usage": "用法：permission <add|remove> <用户名> <权限>",
       "add": "权限已添加。",
       "has_error": "此玩家已拥有此权限！",
       "remove": "权限已移除。",
@@ -240,7 +209,6 @@
       "description": "获取所在位置"
     },
     "quest": {
-      "usage": "quest <add|finish> [任务ID]",
       "added": "已添加任务 %s。",
       "finished": "已完成任务 %s。",
       "not_found": "任务不存在。",
@@ -258,15 +226,11 @@
       "description": "重置当前角色的命之座，执行命令后需重新登录以生效"
     },
     "resetShopLimit": {
-      "usage": "用法：resetshop <玩家ID>",
       "success": "重置完成。",
       "description": "重置指定玩家的商店刷新时间"
     },
-    "restart": {
-      "description": "重新启动服务器"
-    },
     "sendMail": {
-      "usage": "用法：sendmail <用户ID|all|help> [模板ID]",
+      "give_usage": "🇺🇸Usage: give <player> <itemID|itemName> [amount] [level] [refinement]",
       "user_not_exist": "用户 '%s' 不存在。",
       "start_composition": "开始撰写邮件。\n请使用 '/sendmail <标题>' 继续。\n你可以随时使用 '/sendmail stop' 停止。",
       "templates": "邮件模板尚未实装...",
@@ -289,38 +253,22 @@
       "description": "向指定用户发送邮件。此命令的用法会根据撰写阶段而改变"
     },
     "sendMessage": {
-      "usage": "用法：sendmessage <玩家> <消息>",
       "success": "消息已发送。",
-      "description": "向指定玩家发送消息"
+      "description": "向玩家以服务器的身份发送消息。如果没有指定目标，则向服务器的全部玩家发送"
     },
     "setFetterLevel": {
-      "usage": "用法：setfetterlevel <好感度等级>",
       "range_error": "好感度等级必须在 0-10 之间。",
       "success": "好感度已设为 %s 级。",
       "level_error": "无效的好感度等级。",
       "description": "设置当前角色的好感度等级"
     },
-    "setStats": {
-      "usage_console": "用法：setstats|stats @<UID> <属性> <数值>",
-      "usage_ingame": "用法：setstats|stats [@UID] <属性> <数值>",
-      "help_message": "\n可更改的属性列表：hp(生命值)|maxhp(最大生命值)|def(防御力)|atk(攻击力)|em(元素精通)|er(元素充能效率)|crate(暴击率)|cdmg(暴击伤害)|cdr(冷却缩减)|heal(治疗加成)|heali(受治疗加成)|shield(护盾强效)|defi(无视防御)\n元素增伤：epyro(火)|ecryo(冰)|ehydro(水)|egeo(岩)|edendro(草)|eelectro(雷)|ephys(物理)\n元素抗性：respyro(火)|rescryo(冰)|reshydro(水)|resgeo(岩)|resdendro(草)|reselectro(雷)|resphys(物理)\n",
-      "value_error": "无效的属性值。",
-      "uid_error": "无效的UID。",
-      "player_error": "玩家不存在或已离线。",
-      "set_self": "%s 已设为 %s。",
-      "set_for_uid": "%s [来自 %s] 已设为 %s。",
-      "set_max_hp": "最大生命值已设为 %s。",
-      "description": "设置当前角色的属性"
+    "setProp": {
+      "description": "设置账号的状态。比如可以通过此命令启用 godmode，也可以解锁深渊或更改纪行等级\n\t可更改的状态列表：godmode(上帝模式)|nostamina(无限体力)|unlimitedenergy(无限能量)|abyss(深渊)|worldlevel(世界等级)|bplevel(纪行等级)\n查看 PlayerProperty enum 以获得其他数值，格式为 PROP_MAX_SPRING_VOLUME -> max_spring_volume"
     },
-    "setWorldLevel": {
-      "usage": "用法：setworldlevel <等级>",
-      "value_error": "世界等级必须在 0-8 之间。",
-      "success": "世界等级已设为 %s。",
-      "invalid_world_level": "无效的世界等级。",
-      "description": "设置世界等级，执行命令后需重新登录以生效"
+    "setStats": {
+      "description": "设置当前角色的属性\n\t可更改的属性列表：hp(生命值)|maxhp(最大生命值)|def(防御力)|atk(攻击力)|em(元素精通)|er(元素充能效率)|crate(暴击率)|cdmg(暴击伤害)|cdr(冷却缩减)|heal(治疗加成)|heali(受治疗加成)|shield(护盾强效)|defi(无视防御)\n元素增伤：epyro(火)|ecryo(冰)|ehydro(水)|egeo(岩)|edendro(草)|eelectro(雷)|ephys(物理)\n元素抗性：respyro(火)|rescryo(冰)|reshydro(水)|resgeo(岩)|resdendro(草)|reselectro(雷)|resphys(物理)"
     },
     "spawn": {
-      "usage": "用法：spawn <实体ID> [数量] [等级(仅怪物)] [<x> <y> <z>(仅怪物, 可选)]",
       "success": "已生成 %s 个 %s。",
       "limit_reached": "场景中的生成数量已达上限。已替代为生成 %s 个实体。",
       "description": "在你附近生成实体"
@@ -330,16 +278,12 @@
       "description": "停止服务器"
     },
     "talent": {
-      "usage_1": "设置天赋等级：/talent set <天赋ID> <数值>",
-      "usage_2": "另一种设置天赋等级的方法：/talent <n|e|q> <数值>\nn: 普通攻击, e: 元素战技, q: 元素爆发",
-      "usage_3": "获取天赋ID：/talent getid",
       "lower_16": "无效的天赋等级，天赋等级应小于等于15。",
       "set_id": "将天赋等级设为 %s。",
       "set_atk": "将普通攻击等级设为 %s。",
       "set_e": "将元素战技等级设为 %s。",
       "set_q": "将元素爆发等级设为 %s。",
       "invalid_skill_id": "无效的技能ID。",
-      "set_this": "将天赋等级设为 %s。",
       "invalid_level": "无效的天赋等级。",
       "normal_attack_id": "普通攻击的 ID 为 %s。",
       "e_skill_id": "元素战技ID %s。",
@@ -347,17 +291,13 @@
       "description": "设置当前角色的天赋等级"
     },
     "team": {
-      "usage": "用法：team <add|remove|set> [角色ID,...] [索引|first|last|索引-索引,...]",
       "invalid_usage": "无效的用法。",
-      "add_usage": "用法(add)：team add <角色ID,...> [索引]",
       "invalid_index": "无效的索引。",
       "add_too_much": "服务端仅允许你队伍里至多有 %d 名角色。",
       "failed_to_add_avatar": "无法根据ID %s 添加角色。",
-      "remove_usage": "用法(remove)：team remove <索引|first|last|索引-索引,...>",
       "failed_to_parse_index": "无法解析索引：%s",
       "remove_too_much": "你不能删除那么多角色，你的队伍列表将会变空。",
       "ignore_index": "忽略的索引列表：%s",
-      "set_usage": "用法(set)：team set <索引> <角色ID>",
       "index_out_of_range": "你指定的索引超出了范围。",
       "failed_parse_avatar_id": "无法解析的角色ID：%s",
       "avatar_already_in_team": "角色已经在你的队伍中了。",
@@ -370,42 +310,26 @@
       "description": "将你世界中的所有玩家传送到你所在的位置"
     },
     "teleport": {
-      "usage_server": "用法：tp @<玩家ID> <x> <y> <z> [场景ID]",
-      "usage": "用法：tp [@<玩家ID>] <x> <y> <z> [场景ID]",
-      "specify_player_id": "你必须指定一个玩家ID。",
       "invalid_position": "无效的位置。",
+      "exists_error": "此场景不存在。",
       "success": "传送 %s 到坐标 %s, %s, %s，场景为 %s。",
       "description": "改变指定玩家的位置"
     },
-    "unlimitenergy": {
-      "success": "UnlimitEnergy 已设为 %s。[用户：%s]",
-      "config_error": "命令不可用。因为 config.json 中 energyUsage 为 false。",
-      "description": "使用元素爆发而不消耗能量"
-    },
-    "unlocktower": {
-      "success": "现已解锁深境回廊(1-8层)。",
-      "description": "解锁深境螺旋"
-    },
     "weather": {
-      "usage": "用法：weather <气候类型(天气ID)> <天气类型(气候ID)>\n天气类型 0: 无, 1: 晴天, 2: 多云, 3: 雨, 4: 雷雨, 5: 雪, 6: 雾",
-      "success": "已更改气候类型为 %s，天气类型为 %s。",
-      "invalid_id": "无效的ID。",
-      "description": "更改天气"
+      "success": "已设置天气ID 为 %s，气候类型为 %s。",
+      "status": "当前天气ID 为 %s，气候类型为 %s。",
+      "description": "更改天气ID和气候类型。天气ID可以在 WeatherExcelConfigData.json 中找到。\n气候类型：sunny(晴天), cloudy(多云), rain(雨), thunderstorm(雷雨), snow(雪), mist(雾)"
     },
     "ban": {
-      "description": "封禁玩家",
-      "success": "封禁玩家成功。",
-      "failure": "封禁玩家失败，因为无法获取到其账户。",
+      "success": "成功封禁玩家。",
+      "failure": "封禁玩家失败，因为玩家不存在。",
       "invalid_time": "无法解析时间戳。",
-      "invalid_player_id": "无法解析玩家 ID。",
-      "command_usage": "用法：ban <玩家ID> [时间] [原因]"
+      "description": "封禁玩家"
     },
     "unban": {
-      "description": "取消玩家的封禁",
-      "success": "取消玩家的封禁成功。",
-      "failure": "取消玩家的封禁失败，因为无法获取到其账户。",
-      "invalid_player_id": "无法解析玩家 ID。",
-      "command_usage": "用法：unban <玩家ID>"
+      "success": "成功取消玩家的封禁。",
+      "failure": "取消玩家的封禁失败，因为玩家不存在。",
+      "description": "取消玩家的封禁"
     }
   },
   "gacha": {
@@ -423,7 +347,7 @@
   },
   "documentation": {
     "handbook": {
-      "title": "GM Handbook",
+      "title": "🇺🇸GM Handbook",
       "title_commands": "命令",
       "title_avatars": "角色",
       "title_items": "物品",
@@ -439,7 +363,7 @@
     },
     "index": {
       "title": "文档",
-      "handbook": "GM Handbook",
+      "handbook": "🇺🇸GM Handbook",
       "gacha_mapping": "祈愿物品映射JSON"
     }
   }

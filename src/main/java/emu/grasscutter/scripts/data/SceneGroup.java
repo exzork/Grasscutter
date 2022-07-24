@@ -5,173 +5,147 @@ import emu.grasscutter.scripts.ScriptLoader;
 import emu.grasscutter.utils.Position;
 import lombok.Setter;
 import lombok.ToString;
+import org.luaj.vm2.LuaValue;
 
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
+import static emu.grasscutter.config.Configuration.SCRIPT;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static emu.grasscutter.Configuration.SCRIPT;
-
 @ToString
 @Setter
 public class SceneGroup {
-	public transient int block_id; // Not an actual variable in the scripts but we will keep it here for reference
-	
-	public int id;
-	public int refresh_id;
-	public Position pos;
+    public transient int block_id; // Not an actual variable in the scripts but we will keep it here for reference
 
-	public Map<Integer,SceneMonster> monsters; // <ConfigId, Monster>
-	public Map<Integer, SceneGadget> gadgets; // <ConfigId, Gadgets>
-	public Map<String, SceneTrigger> triggers;
-	public Map<Integer, SceneNPC> npc; // <NpcId, NPC>
-	public List<SceneRegion> regions;
-	public List<SceneSuite> suites;
-	public List<SceneVar> variables;
-	
-	public SceneBusiness business;
-	public SceneGarbage garbages;
-	public SceneInitConfig init_config;
+    public int id;
+    public int refresh_id;
+    public Position pos;
 
-	private transient boolean loaded; // Not an actual variable in the scripts either
-	private transient CompiledScript script;
-	private transient Bindings bindings;
-	public static SceneGroup of(int groupId) {
-		var group = new SceneGroup();
-		group.id = groupId;
-		return group;
-	}
+    public Map<Integer,SceneMonster> monsters; // <ConfigId, Monster>
+    public Map<Integer, SceneGadget> gadgets; // <ConfigId, Gadgets>
+    public Map<String, SceneTrigger> triggers;
+    public Map<Integer, SceneRegion> regions;
+    public List<SceneSuite> suites;
+    public List<SceneVar> variables;
 
-	public boolean isLoaded() {
-		return loaded;
-	}
-	
-	public void setLoaded(boolean loaded) {
-		this.loaded = loaded;
-	}
-	
-	public int getBusinessType() {
-		return this.business == null ? 0 : this.business.type;
-	}
-	
-	public List<SceneGadget> getGarbageGadgets() {
-		return this.garbages == null ? null : this.garbages.gadgets;
-	}
+    public SceneBusiness business;
+    public SceneGarbage garbages;
+    public SceneInitConfig init_config;
 
-	public CompiledScript getScript() {
-		return script;
-	}
+    private transient boolean loaded; // Not an actual variable in the scripts either
+    private transient CompiledScript script;
+    private transient Bindings bindings;
+    public static SceneGroup of(int groupId) {
+        var group = new SceneGroup();
+        group.id = groupId;
+        return group;
+    }
 
-	public SceneSuite getSuiteByIndex(int index) {
-		return suites.get(index - 1);
-	}
+    public boolean isLoaded() {
+        return this.loaded;
+    }
 
-	public Bindings getBindings() {
-		return bindings;
-	}
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
+    }
 
-	public synchronized SceneGroup load(int sceneId){
-		if(loaded){
-			return this;
-		}
-		// Set flag here so if there is no script, we dont call this function over and over again.
-		setLoaded(true);
+    public int getBusinessType() {
+        return this.business == null ? 0 : this.business.type;
+    }
 
-		this.bindings = ScriptLoader.getEngine().createBindings();
+    public List<SceneGadget> getGarbageGadgets() {
+        return this.garbages == null ? null : this.garbages.gadgets;
+    }
 
-		CompiledScript cs = ScriptLoader.getScriptByPath(
-				SCRIPT("Scene/" + sceneId + "/scene" + sceneId + "_group" + id + "." + ScriptLoader.getScriptType()));
+    public CompiledScript getScript() {
+        return this.script;
+    }
 
-		if (cs == null) {
-			return this;
-		}
+    public SceneSuite getSuiteByIndex(int index) {
+        return this.suites.get(index - 1);
+    }
 
-		this.script = cs;
-		
-		// Eval script
-		try {
-			cs.eval(bindings);
+    public Bindings getBindings() {
+        return this.bindings;
+    }
 
-			// Set
-			monsters = ScriptLoader.getSerializer().toList(SceneMonster.class, bindings.get("monsters")).stream()
-					.collect(Collectors.toMap(x -> x.config_id, y -> y));
-			monsters.values().forEach(m -> m.group = this);
+    public synchronized SceneGroup load(int sceneId) {
+        if (this.loaded) {
+            return this;
+        }
+        // Set flag here so if there is no script, we don't call this function over and over again.
+        this.setLoaded(true);
 
-			gadgets = ScriptLoader.getSerializer().toList(SceneGadget.class, bindings.get("gadgets")).stream()
-					.collect(Collectors.toMap(x -> x.config_id, y -> y));
-			gadgets.values().forEach(m -> m.group = this);
+        this.bindings = ScriptLoader.getEngine().createBindings();
 
-			triggers = ScriptLoader.getSerializer().toList(SceneTrigger.class, bindings.get("triggers")).stream()
-					.collect(Collectors.toMap(x -> x.name, y -> y));
-			triggers.values().forEach(t -> t.currentGroup = this);
+        CompiledScript cs = ScriptLoader.getScriptByPath(
+                SCRIPT("Scene/" + sceneId + "/scene" + sceneId + "_group" + this.id + "." + ScriptLoader.getScriptType()));
 
-			suites = ScriptLoader.getSerializer().toList(SceneSuite.class, bindings.get("suites"));
-			regions = ScriptLoader.getSerializer().toList(SceneRegion.class, bindings.get("regions"));
-			init_config = ScriptLoader.getSerializer().toObject(SceneInitConfig.class, bindings.get("init_config"));
-			
-			// Garbages TODO fix properly later
-			Object garbagesValue = bindings.get("garbages");
-			if (garbagesValue != null && garbagesValue instanceof LuaValue garbagesTable) {
-				garbages = new SceneGarbage();
-				if (garbagesTable.checktable().get("gadgets") != LuaValue.NIL) {
-					garbages.gadgets = ScriptLoader.getSerializer().toList(SceneGadget.class, garbagesTable.checktable().get("gadgets").checktable());
-					garbages.gadgets.forEach(m -> m.group = this);
-				}
-			}
-			
-			// Add variables to suite
-			variables = ScriptLoader.getSerializer().toList(SceneVar.class, bindings.get("variables"));
-			// NPC in groups
-			npc = ScriptLoader.getSerializer().toList(SceneNPC.class, bindings.get("npcs")).stream()
-					.collect(Collectors.toMap(x -> x.npc_id, y -> y));
-			npc.values().forEach(n -> n.group = this);
+        if (cs == null) {
+            return this;
+        }
 
-			// Add monsters and gadgets to suite
-			for (SceneSuite suite : suites) {
-				suite.sceneMonsters = new ArrayList<>(
-						suite.monsters.stream()
-						.filter(monsters::containsKey)
-						.map(monsters::get)
-						.toList()
-				);
+        this.script = cs;
 
-				suite.sceneGadgets = new ArrayList<>(
-						suite.gadgets.stream()
-								.filter(gadgets::containsKey)
-								.map(gadgets::get)
-								.toList()
-				);
+        // Eval script
+        try {
+            cs.eval(this.bindings);
 
-				suite.sceneTriggers = new ArrayList<>(
-						suite.triggers.stream()
-								.filter(triggers::containsKey)
-								.map(triggers::get)
-								.toList()
-				);
-			}
+            // Set
+            this.monsters = ScriptLoader.getSerializer().toList(SceneMonster.class, this.bindings.get("monsters")).stream()
+                    .collect(Collectors.toMap(x -> x.config_id, y -> y));
+            this.monsters.values().forEach(m -> m.group = this);
 
-		} catch (ScriptException e) {
-			Grasscutter.getLogger().error("Error loading group " + id + " in scene " + sceneId, e);
-		}
-		
-		Grasscutter.getLogger().info("group {} in scene {} is loaded successfully.", id, sceneId);
-		return this;
-	}
+            this.gadgets = ScriptLoader.getSerializer().toList(SceneGadget.class, this.bindings.get("gadgets")).stream()
+                    .collect(Collectors.toMap(x -> x.config_id, y -> y));
+            this.gadgets.values().forEach(m -> m.group = this);
 
-	public Optional<SceneBossChest> searchBossChestInGroup() {
-		return gadgets.values().stream()
-				.filter(g -> g.boss_chest != null && g.boss_chest.monster_config_id > 0)
-				.map(g -> g.boss_chest)
-				.findFirst();
-	}
+            this.triggers = ScriptLoader.getSerializer().toList(SceneTrigger.class, this.bindings.get("triggers")).stream()
+                    .collect(Collectors.toMap(x -> x.name, y -> y));
+            this.triggers.values().forEach(t -> t.currentGroup = this);
+
+            this.suites = ScriptLoader.getSerializer().toList(SceneSuite.class, this.bindings.get("suites"));
+            this.regions = ScriptLoader.getSerializer().toList(SceneRegion.class, this.bindings.get("regions")).stream()
+                .collect(Collectors.toMap(x -> x.config_id, y -> y));
+            this.regions.values().forEach(m -> m.group = this);
+
+            this.init_config = ScriptLoader.getSerializer().toObject(SceneInitConfig.class, this.bindings.get("init_config"));
+
+            // Garbages // TODO: fix properly later
+            Object garbagesValue = this.bindings.get("garbages");
+            if (garbagesValue instanceof LuaValue garbagesTable) {
+                this.garbages = new SceneGarbage();
+                if (garbagesTable.checktable().get("gadgets") != LuaValue.NIL) {
+                    this.garbages.gadgets = ScriptLoader.getSerializer().toList(SceneGadget.class, garbagesTable.checktable().get("gadgets").checktable());
+                    this.garbages.gadgets.forEach(m -> m.group = this);
+                }
+            }
+
+            // Add variables to suite
+            this.variables = ScriptLoader.getSerializer().toList(SceneVar.class, this.bindings.get("variables"));
+
+            // Add monsters and gadgets to suite
+            this.suites.forEach(i -> i.init(this));
+
+        } catch (ScriptException e) {
+            Grasscutter.getLogger().error("An error occurred while loading group " + this.id + " in scene " + sceneId + ".", e);
+        }
+
+        Grasscutter.getLogger().debug("Successfully loaded group {} in scene {}.", this.id, sceneId);
+        return this;
+    }
+
+    public Optional<SceneBossChest> searchBossChestInGroup() {
+        return this.gadgets.values().stream()
+                .filter(g -> g.boss_chest != null && g.boss_chest.monster_config_id > 0)
+                .map(g -> g.boss_chest)
+                .findFirst();
+    }
 
 }

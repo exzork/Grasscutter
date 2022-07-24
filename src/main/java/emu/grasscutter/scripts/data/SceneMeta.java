@@ -11,11 +11,12 @@ import lombok.ToString;
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
+
+import static emu.grasscutter.config.Configuration.SCRIPT;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static emu.grasscutter.Configuration.SCRIPT;
 
 @ToString
 @Setter
@@ -32,7 +33,7 @@ public class SceneMeta {
         return new SceneMeta().load(sceneId);
     }
 
-    public SceneMeta load(int sceneId){
+    public SceneMeta load(int sceneId) {
         // Get compiled script if cached
         CompiledScript cs = ScriptLoader.getScriptByPath(
                 SCRIPT("Scene/" + sceneId + "/scene" + sceneId + "." + ScriptLoader.getScriptType()));
@@ -43,18 +44,18 @@ public class SceneMeta {
         }
 
         // Create bindings
-        context = ScriptLoader.getEngine().createBindings();
+        this.context = ScriptLoader.getEngine().createBindings();
 
         // Eval script
         try {
-            cs.eval(context);
+            cs.eval(this.context);
 
-            this.config = ScriptLoader.getSerializer().toObject(SceneConfig.class, context.get("scene_config"));
+            this.config = ScriptLoader.getSerializer().toObject(SceneConfig.class, this.context.get("scene_config"));
 
             // TODO optimize later
             // Create blocks
-            List<Integer> blockIds = ScriptLoader.getSerializer().toList(Integer.class, context.get("blocks"));
-            List<SceneBlock> blocks = ScriptLoader.getSerializer().toList(SceneBlock.class, context.get("block_rects"));
+            List<Integer> blockIds = ScriptLoader.getSerializer().toList(Integer.class, this.context.get("blocks"));
+            List<SceneBlock> blocks = ScriptLoader.getSerializer().toList(SceneBlock.class, this.context.get("block_rects"));
 
             for (int i = 0; i < blocks.size(); i++) {
                 SceneBlock block = blocks.get(i);
@@ -65,11 +66,11 @@ public class SceneMeta {
             this.blocks = blocks.stream().collect(Collectors.toMap(b -> b.id, b -> b));
             this.sceneBlockIndex = SceneIndexManager.buildIndex(2, blocks, SceneBlock::toRectangle);
 
-        } catch (ScriptException e) {
-            Grasscutter.getLogger().error("Error running script", e);
+        } catch (ScriptException exception) {
+            Grasscutter.getLogger().error("An error occurred while running a script.", exception);
             return null;
         }
-        Grasscutter.getLogger().info("scene {} metadata is loaded successfully.", sceneId);
+        Grasscutter.getLogger().debug("Successfully loaded metadata in scene {}.", sceneId);
         return this;
     }
 }

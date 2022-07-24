@@ -5,7 +5,7 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import org.jetbrains.annotations.NotNull;
 
-import static emu.grasscutter.Configuration.SERVER;
+import static emu.grasscutter.config.Configuration.SERVER;
 
 public class DispatchConnectHandler implements WsConnectHandler {
     @Override
