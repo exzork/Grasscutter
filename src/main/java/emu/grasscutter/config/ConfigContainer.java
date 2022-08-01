@@ -6,6 +6,7 @@ import emu.grasscutter.Grasscutter.ServerDebugMode;
 import emu.grasscutter.Grasscutter.ServerRunMode;
 import emu.grasscutter.utils.Utils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.io.FileReader;
 import java.lang.reflect.Field;
@@ -28,7 +29,7 @@ public class ConfigContainer {
     public static void updateConfig() {
         try { // Check if the server is using a legacy config.
             JsonObject configObject = Grasscutter.getGsonFactory()
-                    .fromJson(new FileReader(Grasscutter.configFile), JsonObject.class);
+                    .fromJson(new FileReader(Grasscutter.configFile, StandardCharsets.UTF_8), JsonObject.class);
             if (!configObject.has("version")) {
                 Grasscutter.getLogger().info("Updating legacy ..");
                 Grasscutter.saveConfig(null);
